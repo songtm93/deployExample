@@ -30,8 +30,10 @@ Jenkins默认监听8080端口，也可通过修改配置`vim /etc/sysconfig/jenk
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addSgRule.jpg" width="800"/>
 再次访问，可以登录，输入之前获得的管理员密码进入jenkins的web页面。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/installPlugins.jpg" width="800"/>
+
 安装插件、设置用户信息、设置Jenkins URL后，终于登陆到jenkins主界面。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/mainSurface.jpg" width="800"/>
+
 安装完成后，接下来就进入到了自动部署的配置。
 
 # 使用webhook方式实现自动部署
