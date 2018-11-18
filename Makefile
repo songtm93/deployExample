@@ -11,4 +11,4 @@ stop:
 	-killall -9 "deployExample"
 
 run:
-	./output/deployExample
+	./output/deployExample &
