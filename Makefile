@@ -8,7 +8,7 @@ build: clean fmt
 	go build -v -o output/deployExample main.go
 
 stop:
-	killall -9 "deployExample"
+	-killall -9 "deployExample"
 
 run:
 	./output/deployExample &
