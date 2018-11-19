@@ -55,8 +55,10 @@ Jenkins默认监听8080端口，也可通过修改配置`vim /etc/sysconfig/jenk
 
 安装完毕后，需要在`系统管理->系统设置->GitHub`选项卡中添加一个Github Server，点击`Add GitHub Server`
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addGitServerButton.jpg" width="800"/>
+
 选择添加凭据，选择Secret Text类型，并把刚才在Github上获取的Access Token填入，点击添加。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addSecretText.jpg" width="800"/>
+
 添加完毕后，在Git Server一栏选择刚才添加的Secret Text，然后点击连接测试，提示`Credentials verified for user xxx, rate limit 4998`。表示连接成功。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/connectionTest.jpg" width="800"/>
 
