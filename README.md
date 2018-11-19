@@ -28,13 +28,14 @@ Jenkins默认监听8080端口，也可通过修改配置`vim /etc/sysconfig/jenk
 通过访问`http://公网IP:8080`来访问。
 这里出现了无法访问的情况：`netstat -anp | grep 8080`查看进程存在，原来是被安全组拦住了，在滴滴云界面上添加一条安全组规则允许8080端口访问。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addSgRule.jpg" width="800"/>
+
 再次访问，可以登录，输入之前获得的管理员密码进入jenkins的web页面。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/installPlugins.jpg" width="800"/>
 
 安装插件、设置用户信息、设置Jenkins URL后，终于登陆到jenkins主界面。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/mainSurface.jpg" width="800"/>
 
-安装完成后，接下来就进入到了自动部署的配置。
+安装完成后，接下来开始自动部署的配置。
 
 # 使用webhook方式实现自动部署
 
@@ -62,12 +63,16 @@ Jenkins默认监听8080端口，也可通过修改配置`vim /etc/sysconfig/jenk
 ## 添加构建任务
 在Jenkins界面上，选择新建任务，选择构建一个自由风格的软件项目。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/createProject.jpg" width="800"/>
+
 勾选Github项目，填入需要自动构建的github项目地址。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/gitURL.jpg" width="800"/>
+
 在源码管理一项，勾选git。填入项目地址，并在`Credentials`项添加一个有访问权限的账户。在`源码库浏览器`一项选择githubweb，并依旧填入项目地址。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/codeManage.jpg" width="800"/>
+
 为了实现push自动构建，还需要在构建触发器中选择`GitHub hook trigger for GITScm polling`，并在构建环境中选择`Use secret text(s) or file(s)`添加之前编辑的`Secret Text（Access Token）`。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/buildTrigger.jpg" width="800"/>
+
 接下来编辑具体项目的构建命令。我在这里使用的示例代码是基于Go语言的，向页面发起请求会返回当前ip以及版本号。
 ```
 export GOPATH=/home/dc2-user/gopath     //设置GOPATH
@@ -81,12 +86,14 @@ make stop   //停止上次进程
 ```
 选择`构建步骤->执行shell`，编辑构建命令。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/buildCommand.jpg" width="800"/>
+
 Jenkins的工作空间为`$JENKINS_HOME`，默认为`/var/lib/jenkins`，可以在`系统管理->系统设置->主目录`下看到。
 Jenkins储存所有的数据文件在这个目录下，可以通过设置`$JENKINS_HOME`环境变量或者更改`Jenkins.war`内的`web.xml`设置文件来修改。这个值在Jenkins运行时是不能更改的，这里不做修改，将jenkins pull下来的代码作软链到`$GOPATH`目录下确保程序能够正常编译。
 
 ## 执行构建
 至此一个简单的自动构建项目已经配置完毕。点击自动构建进行第一次构建。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/firstBuild.jpg" width="800"/>
+
 这里普遍会遇到一个问题，在jenkins的构建过程中，使用shell启动web服务进程后，在构建任务完成时，jenkins会把构建中启动的所有子进程杀掉，导致web进程也down掉了。这个问题可以通过在运行web进程的命令前临时更改构建任务的`$BUILD_ID`来解决。
 ```
 OLD_BUILD_ID=$BUILD_ID  //记录当前BUILD_ID
@@ -115,18 +122,21 @@ BUILD_ID=$OLD_BUILD_ID  //改回BUILD_ID
 
 配置完毕后，点击`Test Configuration`可以测试是否可以连接目标服务器。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addSlave.jpg" width="800"/>
+
 另外，也可以在具体的SSH Server下添加对应其的密码或私钥。注意`Remote Directory`里必须填此用户有权限的目录。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addSlave2.jpg" width="800"/>
 
 ## 配置自动构建任务
 更改好配置后，回到刚才的构建任务，`更改配置->构建后操作->增加构建后操作步骤->Send build artifacts over SSH`
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addPostBuildStep1.jpg" width="800"/>
+
 这里选择刚才添加的目标服务器，并编辑配置。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/addPostBuildStep2.jpg" width="800"/>
 
 ## 运行
 配置好服务后，之后就可以验证自动部署的集群是否可以正常工作了。使用SLB能够方便的进行节点间的负载均衡，在控制台创建一个SLB实例。
 <img src="https://raw.githubusercontent.com/songtm93/deployExample/master/pics/createSLB.jpg" width="800"/>
+
 创建好SLB之后，多次请求SLB的EIP，看是否能够将请求分发到不同服务器上，以及不同服务器是否均部署完毕：
 ```
 curl http://117.51.157.199/
@@ -145,12 +155,12 @@ curl http://117.51.157.199/
 证明集群的自动部署均已成功。
 
 # 参考
-[jenkins使用Publish Over SSH插件实现远程自动部署](http://blog.51cto.com/xiong51/2091739)
+1. [jenkins使用Publish Over SSH插件实现远程自动部署](http://blog.51cto.com/xiong51/2091739)
 
-[Jenkins linux 操作系统一键部署多节点](https://blog.csdn.net/erbao_2014/article/details/62430518)
+2. [Jenkins linux 操作系统一键部署多节点](https://blog.csdn.net/erbao_2014/article/details/62430518)
 
-[构建基于Jenkins + Github的持续集成环境](https://blog.csdn.net/it_hue/article/details/79353563)
+3. [构建基于Jenkins + Github的持续集成环境](https://blog.csdn.net/it_hue/article/details/79353563)
 
-[实战：向GitHub提交代码时触发Jenkins自动构建](https://blog.csdn.net/boling_cavalry/article/details/78943061)
+4. [实战：向GitHub提交代码时触发Jenkins自动构建](https://blog.csdn.net/boling_cavalry/article/details/78943061)
 
-[解决 jenkins 自动杀掉进程大坑](https://blog.csdn.net/recotone/article/details/80510201?utm_source=blogxgwz8)
+5. [解决 jenkins 自动杀掉进程大坑](https://blog.csdn.net/recotone/article/details/80510201?utm_source=blogxgwz8)
