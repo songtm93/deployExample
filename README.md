@@ -146,7 +146,11 @@ curl http://117.51.157.199/
 
 # 参考
 [jenkins使用Publish Over SSH插件实现远程自动部署](http://blog.51cto.com/xiong51/2091739)
+
 [Jenkins linux 操作系统一键部署多节点](https://blog.csdn.net/erbao_2014/article/details/62430518)
+
 [构建基于Jenkins + Github的持续集成环境](https://blog.csdn.net/it_hue/article/details/79353563)
+
 [实战：向GitHub提交代码时触发Jenkins自动构建](https://blog.csdn.net/boling_cavalry/article/details/78943061)
+
 [解决 jenkins 自动杀掉进程大坑](https://blog.csdn.net/recotone/article/details/80510201?utm_source=blogxgwz8)
